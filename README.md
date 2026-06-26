@@ -18,7 +18,7 @@ Given a set of agent conversation logs and a policy document, this pipeline auto
 ## Prerequisites
 
 - Python ≥ 3.10
-- An Azure OpenAI resource with a chat-completion model deployed (e.g. `gpt-4o`)
+- An Azure OpenAI resource with a chat-completion model deployed (e.g. `gpt-5`)
 
 ## Installation
 
