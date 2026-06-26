@@ -1,0 +1,79 @@
+{
+  "_doc": "Expected input format for the Error Discovery pipeline. This is a tau2-bench-style results JSON. Replace the example values with your own data.",
+  "tasks": [
+    {
+      "id": "0",
+      "_doc": "A task object. 'id' is required for alignment with simulations. All other fields are passed verbatim to the LLM as ground truth context.",
+      "instruction": "The user wants to cancel their economy-class flight reservation ABCD12.",
+      "actions": [
+        {"name": "get_reservation_details", "arguments": {"reservation_id": "ABCD12"}},
+        {"name": "cancel_reservation",      "arguments": {"reservation_id": "ABCD12"}}
+      ],
+      "db_state": {
+        "reservations": {
+          "ABCD12": {"cabin": "economy", "status": "active", "flights": ["HAT042"]}
+        }
+      }
+    }
+  ],
+  "simulations": [
+    {
+      "_doc": "A simulation object. 'task_id' must match a task 'id'. 'trial' is the repeat index. 'reward' is the scalar outcome score (0–1).",
+      "task_id": "0",
+      "trial": 0,
+      "reward": 0.5,
+      "reward_info": {
+        "reward": 0.5,
+        "details": "Agent cancelled the correct reservation but failed to confirm the refund amount."
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hi, I need to cancel my flight reservation ABCD12."
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "call_001",
+              "type": "function",
+              "function": {
+                "name": "get_reservation_details",
+                "arguments": "{\"reservation_id\": \"ABCD12\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_001",
+          "content": "{\"reservation_id\": \"ABCD12\", \"cabin\": \"economy\", \"status\": \"active\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "I have retrieved your reservation. I will now cancel it.",
+          "tool_calls": [
+            {
+              "id": "call_002",
+              "type": "function",
+              "function": {
+                "name": "cancel_reservation",
+                "arguments": "{\"reservation_id\": \"ABCD12\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_002",
+          "content": "{\"status\": \"cancelled\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "Your reservation ABCD12 has been cancelled."
+        }
+      ]
+    }
+  ]
+}
